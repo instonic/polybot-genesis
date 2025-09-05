@@ -1,0 +1,46 @@
+{
+  "dispatch_id": "dispatch_1757106384378_3v2ozozab",
+  "timestamp": "2025-09-05T21:06:24.378Z",
+  "full_data": {
+    "prompt": "Explain quantum computing in simple terms",
+    "agents": [
+      "openai",
+      "google",
+      "deepseek"
+    ],
+    "results": {
+      "openai": "Error: Request failed with status code 401",
+      "google": "Error: Request failed with status code 401",
+      "deepseek": "Error: Request failed with status code 401"
+    },
+    "judgeResult": null,
+    "errors": {
+      "openai": {
+        "message": "Request failed with status code 401",
+        "status": 401,
+        "responseTime": 204
+      },
+      "google": {
+        "message": "Request failed with status code 401",
+        "status": 401,
+        "responseTime": 85
+      },
+      "deepseek": {
+        "message": "Request failed with status code 401",
+        "status": 401,
+        "responseTime": 83
+      }
+    },
+    "responseMode": "brief",
+    "maxTokens": 300
+  },
+  "metadata": {
+    "prompt_length": 41,
+    "response_lengths": {
+      "openai": 42,
+      "google": 42,
+      "deepseek": 42
+    },
+    "snapshot_size": 612
+  }
+}

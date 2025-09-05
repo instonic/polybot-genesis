@@ -1,0 +1,629 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Polybot Genesis - Multi-Agent AI Dispatch</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            color: #4a5568;
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            color: #718096;
+            font-size: 1.1rem;
+        }
+
+        .form-section {
+            background: #f7fafc;
+            padding: 25px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            border: 1px solid #e2e8f0;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            font-weight: 600;
+            color: #4a5568;
+            margin-bottom: 8px;
+            font-size: 1rem;
+        }
+
+        textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 1rem;
+            resize: vertical;
+            min-height: 120px;
+            font-family: inherit;
+        }
+
+        textarea:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .agents-section {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .agent-card {
+            background: white;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+
+        .agent-card:hover {
+            border-color: #667eea;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .agent-card.selected {
+            border-color: #667eea;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .judge-section {
+            background: #fff5f5;
+            border: 1px solid #fed7d7;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .judge-title {
+            color: #e53e3e;
+            font-weight: 600;
+            margin-bottom: 15px;
+        }
+
+        .submit-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 100%;
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.3);
+        }
+
+        .submit-btn:disabled {
+            background: #a0aec0;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .results-section {
+            margin-top: 30px;
+        }
+
+        .agent-result {
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 15px;
+        }
+
+        .agent-result.success {
+            border-left: 4px solid #48bb78;
+        }
+
+        .agent-result.error {
+            border-left: 4px solid #f56565;
+            background: #fef5e7;
+        }
+
+        .response-preview {
+            margin-bottom: 10px;
+        }
+
+        .response-full {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 6px;
+            padding: 15px;
+            margin-top: 10px;
+            white-space: pre-wrap;
+            font-family: 'Courier New', monospace;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .expand-btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 5px 12px;
+            border-radius: 4px;
+            font-size: 0.9rem;
+            cursor: pointer;
+            margin-left: 10px;
+        }
+
+        .expand-btn:hover {
+            background: #5a6fd8;
+        }
+
+        .judge-btn {
+            background: linear-gradient(135deg, #ffd89b 0%, #19547b 100%);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 15px;
+            transition: all 0.3s ease;
+        }
+
+        .judge-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(255, 216, 155, 0.3);
+        }
+
+        .judge-btn:disabled {
+            background: #a0aec0;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .agent-header {
+            display: flex;
+            justify-content: between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .agent-name {
+            font-weight: 600;
+            text-transform: uppercase;
+            color: #4a5568;
+        }
+
+        .judge-result {
+            background: linear-gradient(135deg, #ffd89b 0%, #19547b 100%);
+            color: white;
+            border-radius: 8px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+
+        .validation-info {
+            font-size: 0.9rem;
+            color: #718096;
+            margin-top: 10px;
+        }
+
+        .execution-time {
+            font-size: 0.8rem;
+            color: #a0aec0;
+            margin-top: 5px;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #667eea;
+            font-size: 1.1rem;
+        }
+
+        .loading::after {
+            content: '';
+            animation: dots 1.5s infinite;
+        }
+
+        @keyframes dots {
+            0%, 20% { content: ''; }
+            40% { content: '.'; }
+            60% { content: '..'; }
+            80%, 100% { content: '...'; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🤖 Polybot Genesis</h1>
+            <p>Multi-Agent AI Dispatch System with Audit Logging & Judge Fallback</p>
+        </div>
+
+        <div class="form-section">
+            <div class="form-group">
+                <label for="responseMode">Response Mode:</label>
+                <select id="responseMode" style="width: 100%; padding: 12px; border: 2px solid #e2e8f0; border-radius: 8px; font-size: 1rem; margin-bottom: 15px;">
+                    <option value="brief">Brief (300 tokens)</option>
+                    <option value="full" selected>Full (800 tokens)</option>
+                    <option value="deepthink">DeepThink (1500 tokens)</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="prompt">Enter your prompt:</label>
+                <textarea id="prompt" placeholder="Ask something that will be sent to multiple AI agents for comparison..."></textarea>
+            </div>
+
+            <div class="form-group">
+                <label>Select AI Agents:</label>
+                <div class="agents-section">
+                    <div class="agent-card" data-agent="openai">
+                        <strong>OpenAI</strong><br>
+                        <small>GPT-4o-mini</small>
+                    </div>
+                    <div class="agent-card" data-agent="google">
+                        <strong>Google</strong><br>
+                        <small>Gemini 1.5 Flash</small>
+                    </div>
+                    <div class="agent-card" data-agent="deepseek">
+                        <strong>DeepSeek</strong><br>
+                        <small>DeepSeek Chat</small>
+                    </div>
+                    <div class="agent-card" data-agent="anthropic">
+                        <strong>Anthropic</strong><br>
+                        <small>Claude 3 Sonnet</small>
+                    </div>
+                </div>
+            </div>
+
+            <div class="judge-section">
+                <div class="judge-title">🏛️ Judge Agent (Optional)</div>
+                <div class="agents-section">
+                    <div class="agent-card" data-judge="openai">
+                        <strong>OpenAI Judge</strong><br>
+                        <small>Reliable</small>
+                    </div>
+                    <div class="agent-card" data-judge="anthropic">
+                        <strong>Anthropic Judge</strong><br>
+                        <small>Auto-fallback</small>
+                    </div>
+                    <div class="agent-card" data-judge="google">
+                        <strong>Google Judge</strong><br>
+                        <small>Alternative</small>
+                    </div>
+                </div>
+            </div>
+
+            <button class="submit-btn" onclick="submitPrompt()">
+                🚀 Dispatch to AI Agents
+            </button>
+        </div>
+
+        <div id="results" class="results-section" style="display: none;">
+            <!-- Results will be inserted here -->
+        </div>
+    </div>
+
+    <script>
+        let selectedAgents = [];
+        let selectedJudge = null;
+        let lastDispatchData = null;
+
+        // Get API base URL with support for custom domain, Codespaces, and localhost
+        function getBackendUrl() {
+            // Check for custom domain environment variable (future use)
+            const customDomain = window.REACT_APP_API_DOMAIN || '';
+            
+            // Generate Codespaces URL by replacing port in current origin
+            const codespacesUrl = window.location.origin
+                .replace(/-\d+\.app\.github\.dev/, '-3000.app.github.dev');
+            
+            // Check if we're on the custom domain
+            if (window.location.hostname === 'polybot.online') {
+                return 'https://api.polybot.online';
+            }
+            
+            // Priority: custom domain env var > Codespaces > localhost
+            if (customDomain) return customDomain;
+            if (window.location.hostname.includes('github.dev')) return codespacesUrl;
+            return 'http://localhost:3000';
+        }
+
+        // Agent selection
+        document.querySelectorAll('.agent-card[data-agent]').forEach(card => {
+            card.addEventListener('click', () => {
+                const agent = card.getAttribute('data-agent');
+                if (selectedAgents.includes(agent)) {
+                    selectedAgents = selectedAgents.filter(a => a !== agent);
+                    card.classList.remove('selected');
+                } else {
+                    selectedAgents.push(agent);
+                    card.classList.add('selected');
+                }
+            });
+        });
+
+        // Judge selection
+        document.querySelectorAll('.agent-card[data-judge]').forEach(card => {
+            card.addEventListener('click', () => {
+                const judge = card.getAttribute('data-judge');
+                
+                // Clear previous selection
+                document.querySelectorAll('.agent-card[data-judge]').forEach(c => {
+                    c.classList.remove('selected');
+                });
+                
+                if (selectedJudge === judge) {
+                    selectedJudge = null;
+                } else {
+                    selectedJudge = judge;
+                    card.classList.add('selected');
+                }
+            });
+        });
+
+        function expandResponse(agent) {
+            const fullDiv = document.getElementById(`${agent}-full`);
+            const expandBtn = document.querySelector(`[onclick="expandResponse('${agent}')"]`);
+            
+            if (fullDiv.style.display === 'none') {
+                fullDiv.style.display = 'block';
+                expandBtn.textContent = 'Show less';
+                expandBtn.onclick = () => collapseResponse(agent);
+            }
+        }
+
+        function collapseResponse(agent) {
+            const fullDiv = document.getElementById(`${agent}-full`);
+            const expandBtn = document.querySelector(`[onclick="collapseResponse('${agent}')"]`);
+            
+            fullDiv.style.display = 'none';
+            expandBtn.textContent = 'Read more';
+            expandBtn.onclick = () => expandResponse(agent);
+        }
+
+        async function runJudge() {
+            if (!lastDispatchData || !selectedJudge) {
+                alert('No dispatch data or judge selected');
+                return;
+            }
+
+            const judgeBtn = document.getElementById('runJudgeBtn');
+            judgeBtn.disabled = true;
+            judgeBtn.textContent = 'Evaluating...';
+
+            try {
+                const responseMode = document.getElementById('responseMode').value;
+                const backendUrl = getBackendUrl();
+                
+                const response = await fetch(`${backendUrl}/judge`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        dispatch_id: lastDispatchData.dispatch_id,
+                        judge: selectedJudge,
+                        prompt: lastDispatchData.prompt,
+                        results: lastDispatchData.results,
+                        responseMode: responseMode
+                    })
+                });
+
+                const data = await response.json();
+                
+                if (response.ok) {
+                    displayJudgeResult(data.judge);
+                    judgeBtn.style.display = 'none';
+                } else {
+                    throw new Error(data.error || 'Judge evaluation failed');
+                }
+            } catch (error) {
+                alert(`Judge evaluation failed: ${error.message}`);
+            } finally {
+                judgeBtn.disabled = false;
+                judgeBtn.textContent = '⚖️ Evaluate with Judge';
+            }
+        }
+
+        async function submitPrompt() {
+            const prompt = document.getElementById('prompt').value.trim();
+            const responseMode = document.getElementById('responseMode').value;
+            const submitBtn = document.querySelector('.submit-btn');
+            const resultsDiv = document.getElementById('results');
+
+            if (!prompt) {
+                alert('Please enter a prompt');
+                return;
+            }
+
+            if (selectedAgents.length === 0) {
+                alert('Please select at least one AI agent');
+                return;
+            }
+
+            // Show loading
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Dispatching...';
+            resultsDiv.style.display = 'block';
+            resultsDiv.innerHTML = '<div class="loading">Sending prompt to AI agents</div>';
+
+            try {
+                const backendUrl = getBackendUrl();
+                const response = await fetch(`${backendUrl}/dispatch`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        prompt: prompt,
+                        agents: selectedAgents,
+                        judge: selectedJudge,
+                        responseMode: responseMode
+                    })
+                });
+
+                const data = await response.json();
+                
+                if (response.ok) {
+                    lastDispatchData = data;
+                    displayResults(data);
+                } else {
+                    throw new Error(data.error || 'Request failed');
+                }
+            } catch (error) {
+                resultsDiv.innerHTML = `
+                    <div class="agent-result error">
+                        <div class="agent-header">
+                            <span class="agent-name">❌ Error</span>
+                        </div>
+                        <p>${error.message}</p>
+                    </div>
+                `;
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.textContent = '🚀 Dispatch to AI Agents';
+            }
+        }
+
+        function getFirstParagraph(text) {
+            const sentences = text.split(/[.!?]+/);
+            if (sentences.length <= 2) return text;
+            return sentences.slice(0, 2).join('.') + '.';
+        }
+
+        function displayResults(data) {
+            const resultsDiv = document.getElementById('results');
+            let html = `
+                <h3>📋 Dispatch Results (ID: ${data.dispatch_id})</h3>
+                <p class="execution-time">⏱️ Total execution time: ${data.execution_time}ms | Mode: ${data.response_mode} (${data.max_tokens} tokens)</p>
+            `;
+
+            // Agent responses with collapsible content
+            Object.entries(data.results).forEach(([agent, result]) => {
+                const isError = result.startsWith('Error:');
+                const validation = data.validations?.[agent];
+                const preview = isError ? result : getFirstParagraph(result);
+                const needsExpansion = !isError && result.length > preview.length;
+                
+                html += `
+                    <div class="agent-result ${isError ? 'error' : 'success'}">
+                        <div class="agent-header">
+                            <span class="agent-name">${isError ? '❌' : '✅'} ${agent.toUpperCase()}</span>
+                        </div>
+                        <div class="response-preview">
+                            <p>${preview}${needsExpansion ? `<button class="expand-btn" onclick="expandResponse('${agent}')">Read more</button>` : ''}</p>
+                        </div>
+                        ${needsExpansion ? `
+                            <div id="${agent}-full" class="response-full" style="display:none;">
+                                ${result}
+                            </div>
+                        ` : ''}
+                        ${validation ? `
+                            <div class="validation-info">
+                                📊 Quality Score: ${validation.score}/100 | 
+                                ${validation.valid ? '✅ Valid' : '⚠️ Issues: ' + validation.errors.join(', ')}
+                                ${validation.warnings?.length ? ' | ⚠️ ' + validation.warnings.join(', ') : ''}
+                            </div>
+                        ` : ''}
+                    </div>
+                `;
+            });
+
+            // Judge button if judge is ready
+            if (data.judge_ready && selectedJudge) {
+                html += `
+                    <button id="runJudgeBtn" class="judge-btn" onclick="runJudge()">
+                        ⚖️ Evaluate with Judge (${selectedJudge.toUpperCase()})
+                    </button>
+                `;
+            }
+
+            resultsDiv.innerHTML = html;
+        }
+
+        function displayJudgeResult(judge) {
+            const resultsDiv = document.getElementById('results');
+            const judgeHtml = `
+                <div class="judge-result">
+                    <h4>🏛️ Judge Verdict ${judge.fallback_used ? '(Fallback Used)' : ''}</h4>
+                    <p><strong>Judge:</strong> ${judge.agent.toUpperCase()}</p>
+                    ${judge.original_judge ? `<p><strong>Original Judge:</strong> ${judge.original_judge.toUpperCase()} (failed)</p>` : ''}
+                    ${judge.fallback_reason ? `<p><strong>Fallback Reason:</strong> ${judge.fallback_reason}</p>` : ''}
+                    <p><strong>Verdict:</strong> ${judge.verdict || judge.error}</p>
+                    ${judge.validation ? `
+                        <div class="validation-info">
+                            📊 Judge Score: ${judge.validation.score}/100 | 
+                            ${judge.validation.valid ? '✅ Valid' : '⚠️ Issues: ' + judge.validation.errors.join(', ')}
+                        </div>
+                    ` : ''}
+                    <div class="execution-time">⏱️ Judge response time: ${judge.responseTime}ms</div>
+                </div>
+            `;
+            
+            resultsDiv.innerHTML += judgeHtml;
+        }
+
+        // Auto-select OpenAI and Google for demo
+        document.addEventListener('DOMContentLoaded', () => {
+            const openaiCard = document.querySelector('[data-agent="openai"]');
+            const googleCard = document.querySelector('[data-agent="google"]');
+            const deepseekCard = document.querySelector('[data-agent="deepseek"]');
+            
+            openaiCard.click();
+            googleCard.click();
+            deepseekCard.click();
+            
+            // Set example prompt
+            document.getElementById('prompt').value = 'Explain the concept of artificial intelligence in simple terms.';
+        });
+    </script>
+</body>
+</html>
+

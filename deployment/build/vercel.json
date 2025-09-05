@@ -1,0 +1,19 @@
+{
+  "version": 2,
+  "name": "polybot-online",
+  "builds": [
+    {
+      "src": "public/**/*",
+      "use": "@vercel/static"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/(.*)",
+      "dest": "/public/$1"
+    }
+  ],
+  "env": {
+    "REACT_APP_API_DOMAIN": "https://api.polybot.online"
+  }
+}

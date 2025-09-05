@@ -1,0 +1,30 @@
+{
+  "dispatch_id": "dispatch_1757106472513_evn8a5elb",
+  "timestamp": "2025-09-05T21:07:52.514Z",
+  "full_data": {
+    "prompt": "Explain quantum computing in simple terms",
+    "agents": [
+      "openai",
+      "google",
+      "deepseek"
+    ],
+    "results": {
+      "openai": "[OpenAI Simulation] Quantum computing uses quantum mechanics principles like superposition and entanglement to process information. Unlike classical bits (0 or 1), quantum bits (qubits) can exist in multiple states simultaneously, enabling quantum computers to solve certain problems exponentially faster than classical computers.",
+      "google": "[Google Gemini Simulation] Quantum computing harnesses quantum mechanical phenomena to process data. Key concepts include: 1) Superposition - qubits can be in multiple states at once, 2) Entanglement - qubits can be correlated across distances, 3) Quantum gates - manipulate qubits to perform calculations. This enables solving complex optimization and cryptography problems.",
+      "deepseek": "[DeepSeek Simulation] Quantum computing represents a paradigm shift in computation. Traditional computers use binary bits, but quantum computers use qubits that leverage: • Superposition (existing in multiple states) • Entanglement (instant correlation) • Interference (amplifying correct answers). This allows exponential speedup for specific algorithms like Shor's (factoring) and Grover's (search)."
+    },
+    "judgeResult": null,
+    "errors": {},
+    "responseMode": "brief",
+    "maxTokens": 300
+  },
+  "metadata": {
+    "prompt_length": 41,
+    "response_lengths": {
+      "openai": 330,
+      "google": 375,
+      "deepseek": 401
+    },
+    "snapshot_size": 1320
+  }
+}

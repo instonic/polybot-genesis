@@ -1,0 +1,9 @@
+node_modules/
+.env
+logs/*.jsonl
+logs/*.json
+snapshots/*.json
+*.log
+.DS_Store
+.vscode/
+.git/
