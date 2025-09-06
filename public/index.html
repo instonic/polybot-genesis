@@ -6,6 +6,24 @@
     <title>Polybot Genesis - Multi-Agent AI Dispatch</title>
     <link rel="icon" type="image/svg+xml" href="/favicon.svg">
     <style>
+        :root {
+            --primary-color: #667eea;
+            --primary-dark: #764ba2;
+            --secondary-color: #f7fafc;
+            --accent-color: #4299e1;
+            --success-color: #48bb78;
+            --warning-color: #ed8936;
+            --error-color: #f56565;
+            --text-primary: #2d3748;
+            --text-secondary: #718096;
+            --border-color: #e2e8f0;
+            --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.1);
+            --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.1);
+            --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.1);
+            --border-radius: 8px;
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
         * {
             margin: 0;
             padding: 0;
@@ -13,348 +31,724 @@
         }
 
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
             min-height: 100vh;
-            padding: 20px;
+            color: var(--text-primary);
+            overflow-x: hidden;
         }
 
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            background: rgba(255, 255, 255, 0.95);
-            border-radius: 15px;
-            padding: 30px;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        .app-container {
+            display: flex;
+            min-height: 100vh;
+            max-width: 100vw;
         }
 
-        .header {
+        /* Left Pane - Control Panel */
+        .control-panel {
+            width: 30%;
+            min-width: 350px;
+            background: rgba(255, 255, 255, 0.98);
+            backdrop-filter: blur(10px);
+            border-right: 1px solid var(--border-color);
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            box-shadow: var(--shadow-lg);
+        }
+
+        .panel-header {
+            padding: 24px;
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+            color: white;
             text-align: center;
-            margin-bottom: 30px;
+            position: sticky;
+            top: 0;
+            z-index: 10;
         }
 
-        .header h1 {
-            color: #4a5568;
-            font-size: 2.5rem;
-            margin-bottom: 10px;
+        .panel-header h1 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 4px;
         }
 
-        .header p {
-            color: #718096;
+        .panel-header p {
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+
+        .control-sections {
+            flex: 1;
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+
+        .control-section {
+            background: var(--secondary-color);
+            border-radius: var(--border-radius);
+            padding: 20px;
+            border: 1px solid var(--border-color);
+            transition: var(--transition);
+        }
+
+        .control-section:hover {
+            box-shadow: var(--shadow-md);
+            transform: translateY(-1px);
+        }
+
+        .section-title {
             font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
 
-        .form-section {
-            background: #f7fafc;
-            padding: 25px;
-            border-radius: 10px;
-            margin-bottom: 30px;
-            border: 1px solid #e2e8f0;
+        .section-title::before {
+            content: '';
+            width: 4px;
+            height: 20px;
+            background: linear-gradient(to bottom, var(--primary-color), var(--primary-dark));
+            border-radius: 2px;
         }
 
+        /* AI Models Selection */
+        .models-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 12px;
+        }
+
+        .model-checkbox {
+            display: flex;
+            align-items: center;
+            padding: 12px 16px;
+            background: white;
+            border: 2px solid var(--border-color);
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            transition: var(--transition);
+            position: relative;
+        }
+
+        .model-checkbox:hover {
+            border-color: var(--accent-color);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .model-checkbox.selected {
+            border-color: var(--primary-color);
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
+            color: white;
+        }
+
+        .model-checkbox input[type="checkbox"] {
+            display: none;
+        }
+
+        .model-info {
+            flex: 1;
+            margin-left: 12px;
+        }
+
+        .model-name {
+            font-weight: 600;
+            margin-bottom: 2px;
+        }
+
+        .model-description {
+            font-size: 0.85rem;
+            opacity: 0.7;
+        }
+
+        .model-icon {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: var(--accent-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+
+        .model-icon.openai { background: #10a37f; }
+        .model-icon.google { background: #4285f4; }
+        .model-icon.deepseek { background: #ff6b35; }
+        .model-icon.anthropic { background: #d4a574; }
+
+        /* Form Controls */
         .form-group {
-            margin-bottom: 20px;
+            margin-bottom: 16px;
         }
 
-        label {
+        .form-label {
             display: block;
             font-weight: 600;
-            color: #4a5568;
+            color: var(--text-primary);
             margin-bottom: 8px;
-            font-size: 1rem;
+            font-size: 0.9rem;
         }
 
-        textarea {
+        .form-input, .form-select, .form-textarea {
             width: 100%;
-            padding: 12px;
-            border: 2px solid #e2e8f0;
-            border-radius: 8px;
+            padding: 12px 16px;
+            border: 2px solid var(--border-color);
+            border-radius: var(--border-radius);
             font-size: 1rem;
-            resize: vertical;
-            min-height: 120px;
-            font-family: inherit;
+            transition: var(--transition);
+            background: white;
         }
 
-        textarea:focus {
+        .form-input:focus, .form-select:focus, .form-textarea:focus {
             outline: none;
-            border-color: #667eea;
+            border-color: var(--primary-color);
             box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
         }
 
-        .agents-section {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 15px;
-            margin-bottom: 20px;
+        .form-textarea {
+            min-height: 120px;
+            resize: vertical;
+            font-family: inherit;
         }
 
-        .agent-card {
-            background: white;
-            border: 2px solid #e2e8f0;
-            border-radius: 8px;
-            padding: 15px;
+        /* Settings Controls */
+        .settings-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+
+        .range-control {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .range-input {
+            width: 100%;
+            height: 6px;
+            border-radius: 3px;
+            background: var(--border-color);
+            outline: none;
+            -webkit-appearance: none;
+        }
+
+        .range-input::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: var(--primary-color);
             cursor: pointer;
-            transition: all 0.3s ease;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .range-value {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
             text-align: center;
         }
 
-        .agent-card:hover {
-            border-color: #667eea;
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-        }
-
-        .agent-card.selected {
-            border-color: #667eea;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-        }
-
-        .judge-section {
-            background: #fff5f5;
-            border: 1px solid #fed7d7;
-            border-radius: 8px;
-            padding: 20px;
-            margin-bottom: 20px;
-        }
-
-        .judge-title {
-            color: #e53e3e;
-            font-weight: 600;
-            margin-bottom: 15px;
-        }
-
-        .submit-btn {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        /* Send Button */
+        .send-button {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
             color: white;
             border: none;
-            padding: 15px 40px;
-            border-radius: 8px;
+            padding: 16px 24px;
+            border-radius: var(--border-radius);
             font-size: 1.1rem;
             font-weight: 600;
             cursor: pointer;
-            transition: all 0.3s ease;
+            transition: var(--transition);
             width: 100%;
-        }
-
-        .submit-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.3);
-        }
-
-        .submit-btn:disabled {
-            background: #a0aec0;
-            cursor: not-allowed;
-            transform: none;
-            box-shadow: none;
-        }
-
-        .results-section {
-            margin-top: 30px;
-        }
-
-        .agent-result {
-            background: white;
-            border: 1px solid #e2e8f0;
-            border-radius: 8px;
-            padding: 20px;
-            margin-bottom: 15px;
-        }
-
-        .agent-result.success {
-            border-left: 4px solid #48bb78;
-        }
-
-        .agent-result.error {
-            border-left: 4px solid #f56565;
-            background: #fef5e7;
-        }
-
-        .response-preview {
-            margin-bottom: 10px;
-        }
-
-        .response-full {
-            background: #f8f9fa;
-            border: 1px solid #e9ecef;
-            border-radius: 6px;
-            padding: 15px;
-            margin-top: 10px;
-            white-space: pre-wrap;
-            font-family: 'Courier New', monospace;
-            max-height: 400px;
-            overflow-y: auto;
-        }
-
-        .expand-btn {
-            background: #667eea;
-            color: white;
-            border: none;
-            padding: 5px 12px;
-            border-radius: 4px;
-            font-size: 0.9rem;
-            cursor: pointer;
-            margin-left: 10px;
-        }
-
-        .expand-btn:hover {
-            background: #5a6fd8;
-        }
-
-        .judge-btn {
-            background: linear-gradient(135deg, #ffd89b 0%, #19547b 100%);
-            color: white;
-            border: none;
-            padding: 12px 25px;
-            border-radius: 8px;
-            font-size: 1rem;
-            font-weight: 600;
-            cursor: pointer;
-            margin-top: 15px;
-            transition: all 0.3s ease;
-        }
-
-        .judge-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 20px rgba(255, 216, 155, 0.3);
-        }
-
-        .judge-btn:disabled {
-            background: #a0aec0;
-            cursor: not-allowed;
-            transform: none;
-            box-shadow: none;
-        }
-
-        .agent-header {
             display: flex;
-            justify-content: between;
             align-items: center;
-            margin-bottom: 10px;
+            justify-content: center;
+            gap: 8px;
+            margin-top: auto;
         }
 
-        .agent-name {
+        .send-button:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .send-button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* Right Pane - Output Area */
+        .output-area {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background: rgba(255, 255, 255, 0.95);
+            overflow: hidden;
+        }
+
+        .output-header {
+            padding: 20px 24px;
+            background: white;
+            border-bottom: 1px solid var(--border-color);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .output-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 4px;
+        }
+
+        .output-subtitle {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        .output-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 24px;
+        }
+
+        /* Response Cards */
+        .response-container {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .response-card {
+            background: white;
+            border-radius: var(--border-radius);
+            border: 1px solid var(--border-color);
+            overflow: hidden;
+            transition: var(--transition);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .response-card:hover {
+            box-shadow: var(--shadow-md);
+            transform: translateY(-1px);
+        }
+
+        .response-header {
+            padding: 16px 20px;
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .response-agent {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-weight: 600;
+        }
+
+        .agent-badge {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
             font-weight: 600;
             text-transform: uppercase;
-            color: #4a5568;
         }
 
-        .judge-result {
-            background: linear-gradient(135deg, #ffd89b 0%, #19547b 100%);
-            color: white;
-            border-radius: 8px;
+        .agent-badge.openai { background: #10a37f; color: white; }
+        .agent-badge.google { background: #4285f4; color: white; }
+        .agent-badge.deepseek { background: #ff6b35; color: white; }
+        .agent-badge.anthropic { background: #d4a574; color: white; }
+
+        .response-meta {
+            display: flex;
+            gap: 16px;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+
+        .response-body {
             padding: 20px;
+            line-height: 1.6;
+        }
+
+        /* Judge Results */
+        .judge-section {
+            margin-top: 24px;
+            padding: 20px;
+            background: linear-gradient(135deg, #f0f8ff 0%, #e6f3ff 100%);
+            border-radius: var(--border-radius);
+            border: 1px solid #b3d9ff;
+        }
+
+        .judge-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 16px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .judge-button {
+            background: linear-gradient(135deg, #e53e3e 0%, #c53030 100%);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: var(--border-radius);
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            margin-bottom: 16px;
+        }
+
+        .judge-button:hover:not(:disabled) {
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .judge-button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .judge-results {
+            display: grid;
+            gap: 12px;
+        }
+
+        .score-bar {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 8px 0;
+        }
+
+        .score-label {
+            min-width: 80px;
+            font-weight: 500;
+        }
+
+        .score-progress {
+            flex: 1;
+            height: 8px;
+            background: var(--border-color);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .score-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary-color), var(--success-color));
+            transition: width 0.5s ease;
+        }
+
+        .score-value {
+            min-width: 50px;
+            text-align: right;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        /* Audit Section */
+        .audit-section {
             margin-top: 20px;
+            padding: 16px;
+            background: #f8f9fa;
+            border-radius: var(--border-radius);
+            border: 1px solid var(--border-color);
         }
 
-        .validation-info {
-            font-size: 0.9rem;
-            color: #718096;
-            margin-top: 10px;
+        .audit-title {
+            font-weight: 600;
+            margin-bottom: 12px;
+            color: var(--text-primary);
         }
 
-        .execution-time {
+        .audit-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 12px;
+        }
+
+        .audit-item {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .audit-label {
             font-size: 0.8rem;
-            color: #a0aec0;
-            margin-top: 5px;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
 
-        .loading {
-            text-align: center;
+        .audit-value {
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        /* Loading States */
+        .loading-spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 2px solid var(--border-color);
+            border-radius: 50%;
+            border-top-color: var(--primary-color);
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .loading-text {
+            display: flex;
+            align-items: center;
+            gap: 12px;
             padding: 40px;
-            color: #667eea;
-            font-size: 1.1rem;
+            text-align: center;
+            color: var(--text-secondary);
+            justify-content: center;
         }
 
-        .loading::after {
-            content: '';
-            animation: dots 1.5s infinite;
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--text-secondary);
         }
 
-        @keyframes dots {
-            0%, 20% { content: ''; }
-            40% { content: '.'; }
-            60% { content: '..'; }
-            80%, 100% { content: '...'; }
+        .empty-state-icon {
+            font-size: 3rem;
+            margin-bottom: 16px;
+            opacity: 0.5;
+        }
+
+        .empty-state-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .empty-state-description {
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 1024px) {
+            .control-panel {
+                width: 35%;
+                min-width: 320px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .app-container {
+                flex-direction: column;
+            }
+            
+            .control-panel {
+                width: 100%;
+                min-width: unset;
+                border-right: none;
+                border-bottom: 1px solid var(--border-color);
+            }
+            
+            .settings-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .output-area {
+                min-height: 60vh;
+            }
+        }
+
+        /* Accessibility */
+        .sr-only {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            white-space: nowrap;
+            border: 0;
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="header">
-            <h1>🤖 Polybot Genesis</h1>
-            <p>Multi-Agent AI Dispatch System with Audit Logging & Judge Fallback</p>
+    <div class="app-container">
+        <!-- Left Pane - Control Panel -->
+        <div class="control-panel">
+            <div class="panel-header">
+                <h1>🤖 Polybot Genesis</h1>
+                <p>Multi-Agent AI Dispatch System</p>
+            </div>
+            
+            <div class="control-sections">
+                <!-- AI Models Selection -->
+                <div class="control-section">
+                    <div class="section-title">🎯 AI Models</div>
+                    <div class="models-grid">
+                        <label class="model-checkbox" data-agent="openai">
+                            <input type="checkbox" name="agents" value="openai">
+                            <div class="model-icon openai">O</div>
+                            <div class="model-info">
+                                <div class="model-name">OpenAI GPT-4</div>
+                                <div class="model-description">Advanced reasoning and analysis</div>
+                            </div>
+                        </label>
+                        
+                        <label class="model-checkbox" data-agent="google">
+                            <input type="checkbox" name="agents" value="google">
+                            <div class="model-icon google">G</div>
+                            <div class="model-info">
+                                <div class="model-name">Google Gemini</div>
+                                <div class="model-description">Multimodal AI capabilities</div>
+                            </div>
+                        </label>
+                        
+                        <label class="model-checkbox" data-agent="deepseek">
+                            <input type="checkbox" name="agents" value="deepseek">
+                            <div class="model-icon deepseek">D</div>
+                            <div class="model-info">
+                                <div class="model-name">DeepSeek Coder</div>
+                                <div class="model-description">Code and technical analysis</div>
+                            </div>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Judge Model Selection -->
+                <div class="control-section">
+                    <div class="section-title">⚖️ Judge Model</div>
+                    <div class="form-group">
+                        <select id="judgeModel" class="form-select" aria-label="Select judge model">
+                            <option value="anthropic">Anthropic Claude (Default)</option>
+                            <option value="openai">OpenAI GPT-4</option>
+                            <option value="auto">Auto-Select</option>
+                            <option value="none">No Judge</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Query Input -->
+                <div class="control-section">
+                    <div class="section-title">💬 Query</div>
+                    <div class="form-group">
+                        <label for="prompt" class="form-label">Enter your prompt</label>
+                        <textarea 
+                            id="prompt" 
+                            class="form-textarea" 
+                            placeholder="Ask a question or describe what you need help with..."
+                            aria-describedby="prompt-help"
+                            required
+                        ></textarea>
+                        <div id="prompt-help" class="sr-only">Enter the prompt you want to send to the AI models</div>
+                    </div>
+                </div>
+
+                <!-- Settings -->
+                <div class="control-section">
+                    <div class="section-title">⚙️ Settings</div>
+                    <div class="settings-grid">
+                        <div class="form-group">
+                            <label for="temperature" class="form-label">Temperature</label>
+                            <div class="range-control">
+                                <input 
+                                    type="range" 
+                                    id="temperature" 
+                                    class="range-input" 
+                                    min="0" 
+                                    max="1" 
+                                    step="0.1" 
+                                    value="0.7"
+                                    aria-label="Temperature setting"
+                                >
+                                <div class="range-value">0.7</div>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="responseMode" class="form-label">Response Mode</label>
+                            <select id="responseMode" class="form-select" aria-label="Select response mode">
+                                <option value="brief">Brief (300 tokens)</option>
+                                <option value="full" selected>Full (800 tokens)</option>
+                                <option value="deepthink">Deep Think (1500 tokens)</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="maxTokens" class="form-label">Max Tokens</label>
+                        <div class="range-control">
+                            <input 
+                                type="range" 
+                                id="maxTokens" 
+                                class="range-input" 
+                                min="100" 
+                                max="2000" 
+                                step="50" 
+                                value="800"
+                                aria-label="Maximum tokens"
+                            >
+                            <div class="range-value">800</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Send Button -->
+                <button id="sendButton" class="send-button" aria-label="Send prompt to selected AI models">
+                    <span>🚀</span>
+                    <span>Dispatch to AI Agents</span>
+                </button>
+            </div>
         </div>
 
-        <div class="form-section">
-            <div class="form-group">
-                <label for="responseMode">Response Mode:</label>
-                <select id="responseMode" style="width: 100%; padding: 12px; border: 2px solid #e2e8f0; border-radius: 8px; font-size: 1rem; margin-bottom: 15px;">
-                    <option value="brief">Brief (300 tokens)</option>
-                    <option value="full" selected>Full (800 tokens)</option>
-                    <option value="deepthink">DeepThink (1500 tokens)</option>
-                </select>
+        <!-- Right Pane - Output Area -->
+        <div class="output-area">
+            <div class="output-header">
+                <div class="output-title">AI Responses</div>
+                <div class="output-subtitle">Live results from your selected AI models</div>
             </div>
-
-            <div class="form-group">
-                <label for="prompt">Enter your prompt:</label>
-                <textarea id="prompt" placeholder="Ask something that will be sent to multiple AI agents for comparison..."></textarea>
-            </div>
-
-            <div class="form-group">
-                <label>Select AI Agents:</label>
-                <div class="agents-section">
-                    <div class="agent-card" data-agent="openai">
-                        <strong>OpenAI</strong><br>
-                        <small>GPT-4o-mini</small>
-                    </div>
-                    <div class="agent-card" data-agent="google">
-                        <strong>Google</strong><br>
-                        <small>Gemini 1.5 Flash</small>
-                    </div>
-                    <div class="agent-card" data-agent="deepseek">
-                        <strong>DeepSeek</strong><br>
-                        <small>DeepSeek Chat</small>
-                    </div>
-                    <div class="agent-card" data-agent="anthropic">
-                        <strong>Anthropic</strong><br>
-                        <small>Claude 3 Sonnet</small>
+            
+            <div class="output-content">
+                <div id="resultsContainer" class="response-container">
+                    <div class="empty-state">
+                        <div class="empty-state-icon">🤖</div>
+                        <div class="empty-state-title">Ready to Dispatch</div>
+                        <div class="empty-state-description">
+                            Select your AI models, enter a prompt, and click "Dispatch to AI Agents" to see responses from multiple AI systems.
+                        </div>
                     </div>
                 </div>
             </div>
-
-            <div class="judge-section">
-                <div class="judge-title">🏛️ Judge Agent (Optional)</div>
-                <div class="agents-section">
-                    <div class="agent-card" data-judge="openai">
-                        <strong>OpenAI Judge</strong><br>
-                        <small>Reliable</small>
-                    </div>
-                    <div class="agent-card" data-judge="anthropic">
-                        <strong>Anthropic Judge</strong><br>
-                        <small>Auto-fallback</small>
-                    </div>
-                    <div class="agent-card" data-judge="google">
-                        <strong>Google Judge</strong><br>
-                        <small>Alternative</small>
-                    </div>
-                </div>
-            </div>
-
-            <button class="submit-btn" onclick="submitPrompt()">
-                🚀 Dispatch to AI Agents
-            </button>
-        </div>
-
-        <div id="results" class="results-section" style="display: none;">
-            <!-- Results will be inserted here -->
         </div>
     </div>
 
     <script>
+        // Global variables
         let selectedAgents = [];
-        let selectedJudge = null;
+        let selectedJudge = 'anthropic';
         let lastDispatchData = null;
+        let isDispatching = false;
 
         // Get API base URL with support for Vercel API, custom domain, Codespaces, and localhost
         function getBackendUrl() {
@@ -376,149 +770,121 @@
             return 'http://localhost:3000';
         }
 
-        // Agent selection
-        document.querySelectorAll('.agent-card[data-agent]').forEach(card => {
-            card.addEventListener('click', () => {
-                const agent = card.getAttribute('data-agent');
-                if (selectedAgents.includes(agent)) {
-                    selectedAgents = selectedAgents.filter(a => a !== agent);
-                    card.classList.remove('selected');
-                } else {
-                    selectedAgents.push(agent);
-                    card.classList.add('selected');
+        // Initialize the application
+        function initializeApp() {
+            setupEventListeners();
+            updateRangeValues();
+            updateSendButton();
+        }
+
+        // Setup event listeners
+        function setupEventListeners() {
+            // Model selection
+            document.querySelectorAll('.model-checkbox').forEach(checkbox => {
+                checkbox.addEventListener('click', handleModelSelection);
+            });
+
+            // Judge model selection
+            document.getElementById('judgeModel').addEventListener('change', (e) => {
+                selectedJudge = e.target.value;
+            });
+
+            // Range inputs
+            document.querySelectorAll('.range-input').forEach(range => {
+                range.addEventListener('input', updateRangeValues);
+            });
+
+            // Response mode change
+            document.getElementById('responseMode').addEventListener('change', updateTokensFromMode);
+
+            // Send button
+            document.getElementById('sendButton').addEventListener('click', handleDispatch);
+
+            // Prompt textarea
+            document.getElementById('prompt').addEventListener('input', updateSendButton);
+        }
+
+        // Handle model selection
+        function handleModelSelection(event) {
+            event.preventDefault();
+            const checkbox = event.currentTarget;
+            const agent = checkbox.dataset.agent;
+            
+            if (selectedAgents.includes(agent)) {
+                selectedAgents = selectedAgents.filter(a => a !== agent);
+                checkbox.classList.remove('selected');
+                checkbox.querySelector('input').checked = false;
+            } else {
+                selectedAgents.push(agent);
+                checkbox.classList.add('selected');
+                checkbox.querySelector('input').checked = true;
+            }
+            
+            updateSendButton();
+        }
+
+        // Update range values display
+        function updateRangeValues() {
+            document.querySelectorAll('.range-input').forEach(range => {
+                const value = range.value;
+                const valueDisplay = range.parentElement.querySelector('.range-value');
+                if (valueDisplay) {
+                    valueDisplay.textContent = value;
                 }
             });
-        });
+        }
 
-        // Judge selection
-        document.querySelectorAll('.agent-card[data-judge]').forEach(card => {
-            card.addEventListener('click', () => {
-                const judge = card.getAttribute('data-judge');
-                
-                // Clear previous selection
-                document.querySelectorAll('.agent-card[data-judge]').forEach(c => {
-                    c.classList.remove('selected');
-                });
-                
-                if (selectedJudge === judge) {
-                    selectedJudge = null;
-                } else {
-                    selectedJudge = judge;
-                    card.classList.add('selected');
-                }
-            });
-        });
-
-        function expandResponse(agent) {
-            const fullDiv = document.getElementById(`${agent}-full`);
-            const expandBtn = document.querySelector(`[onclick="expandResponse('${agent}')"]`);
+        // Update tokens based on response mode
+        function updateTokensFromMode() {
+            const mode = document.getElementById('responseMode').value;
+            const tokensRange = document.getElementById('maxTokens');
+            const tokenModes = {
+                brief: 300,
+                full: 800,
+                deepthink: 1500
+            };
             
-            if (fullDiv.style.display === 'none') {
-                fullDiv.style.display = 'block';
-                expandBtn.textContent = 'Show less';
-                expandBtn.onclick = () => collapseResponse(agent);
+            if (tokenModes[mode]) {
+                tokensRange.value = tokenModes[mode];
+                updateRangeValues();
             }
         }
 
-        function collapseResponse(agent) {
-            const fullDiv = document.getElementById(`${agent}-full`);
-            const expandBtn = document.querySelector(`[onclick="collapseResponse('${agent}')"]`);
-            
-            fullDiv.style.display = 'none';
-            expandBtn.textContent = 'Read more';
-            expandBtn.onclick = () => expandResponse(agent);
-        }
-
-        async function runJudge() {
-            if (!lastDispatchData || !selectedJudge) {
-                alert('No dispatch data or judge selected');
-                return;
-            }
-
-            const judgeBtn = document.getElementById('runJudgeBtn');
-            judgeBtn.disabled = true;
-            judgeBtn.textContent = 'Evaluating...';
-
-            try {
-                const responseMode = document.getElementById('responseMode').value;
-                const backendUrl = getBackendUrl();
-                
-                const response = await fetch(`${backendUrl}/judge`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        dispatch_id: lastDispatchData.dispatch_id,
-                        judge: selectedJudge,
-                        prompt: lastDispatchData.prompt,
-                        results: lastDispatchData.results,
-                        responseMode: responseMode
-                    })
-                });
-
-                const data = await response.json();
-                
-                if (response.ok) {
-                    displayJudgeResult(data.judge);
-                    judgeBtn.style.display = 'none';
-                } else {
-                    throw new Error(data.error || 'Judge evaluation failed');
-                }
-            } catch (error) {
-                console.log('Judge API not available, showing demo evaluation:', error.message);
-                
-                // Demo judge evaluation when API is not available
-                const agents = Object.keys(lastDispatchData.responses);
-                const randomWinner = agents[Math.floor(Math.random() * agents.length)];
-                
-                const demoJudgeResult = {
-                    status: 'success',
-                    judge: selectedJudge || 'anthropic',
-                    winner: randomWinner,
-                    reasoning: `After analyzing all responses, ${randomWinner.toUpperCase()} provided the most comprehensive and accurate answer. The response demonstrated strong understanding of the prompt and delivered practical, well-structured information. (Demo evaluation)`,
-                    scores: {},
-                    timestamp: new Date().toISOString(),
-                    mode: 'demo'
-                };
-                
-                // Generate demo scores
-                agents.forEach(agent => {
-                    demoJudgeResult.scores[agent] = Math.random() * 0.3 + 0.7;
-                });
-                demoJudgeResult.scores[randomWinner] = Math.max(demoJudgeResult.scores[randomWinner], 0.85);
-                
-                displayJudgeResults(demoJudgeResult);
-            } finally {
-                judgeBtn.disabled = false;
-                judgeBtn.textContent = '⚖️ Evaluate with Judge';
-            }
-        }
-
-        async function submitPrompt() {
+        // Update send button state
+        function updateSendButton() {
+            const sendButton = document.getElementById('sendButton');
             const prompt = document.getElementById('prompt').value.trim();
-            const responseMode = document.getElementById('responseMode').value;
-            const submitBtn = document.querySelector('.submit-btn');
-            const resultsDiv = document.getElementById('results');
-
-            if (!prompt) {
-                alert('Please enter a prompt');
-                return;
+            const hasAgents = selectedAgents.length > 0;
+            const hasPrompt = prompt.length > 0;
+            
+            sendButton.disabled = !hasAgents || !hasPrompt || isDispatching;
+            
+            if (isDispatching) {
+                sendButton.innerHTML = '<div class="loading-spinner"></div><span>Dispatching...</span>';
+            } else {
+                sendButton.innerHTML = '<span>🚀</span><span>Dispatch to AI Agents</span>';
             }
+        }
 
-            if (selectedAgents.length === 0) {
-                alert('Please select at least one AI agent');
-                return;
-            }
+        // Handle dispatch
+        async function handleDispatch() {
+            if (isDispatching) return;
+            
+            const prompt = document.getElementById('prompt').value.trim();
+            if (!prompt || selectedAgents.length === 0) return;
 
-            // Show loading
-            submitBtn.disabled = true;
-            submitBtn.textContent = 'Dispatching...';
-            resultsDiv.style.display = 'block';
-            resultsDiv.innerHTML = '<div class="loading">Sending prompt to AI agents</div>';
+            isDispatching = true;
+            updateSendButton();
+
+            const resultsContainer = document.getElementById('resultsContainer');
+            resultsContainer.innerHTML = '<div class="loading-text"><div class="loading-spinner"></div>Dispatching to AI agents...</div>';
 
             try {
                 const backendUrl = getBackendUrl();
+                const temperature = document.getElementById('temperature').value;
+                const maxTokens = document.getElementById('maxTokens').value;
+                const responseMode = document.getElementById('responseMode').value;
+
                 const response = await fetch(`${backendUrl}/dispatch`, {
                     method: 'POST',
                     headers: {
@@ -528,7 +894,9 @@
                         prompt: prompt,
                         agents: selectedAgents,
                         judge: selectedJudge,
-                        responseMode: responseMode
+                        responseMode: responseMode,
+                        temperature: parseFloat(temperature),
+                        maxTokens: parseInt(maxTokens)
                     })
                 });
 
@@ -560,7 +928,7 @@
                 // Generate demo responses for selected agents
                 selectedAgents.forEach(agent => {
                     demoResponse.responses[agent] = {
-                        response: `This is a demo response from ${agent.toUpperCase()} for the prompt: "${prompt}"\n\nThe actual implementation would connect to the ${agent} API to generate intelligent responses. Currently showing demo mode since the backend API is being configured.`,
+                        response: `This is a demo response from ${agent.toUpperCase()} for the prompt: "${prompt}"\n\nThe actual implementation would connect to the ${agent} API to generate intelligent responses. Currently showing demo mode since the backend API is being configured.\n\nThis response demonstrates the multi-agent dispatch system's capability to coordinate multiple AI models and present their responses in a unified interface.`,
                         tokens: Math.floor(Math.random() * 50) + 100,
                         timestamp: new Date().toISOString(),
                         model: agent === 'openai' ? 'gpt-4' : agent === 'google' ? 'gemini-pro' : 'deepseek-coder'
@@ -570,103 +938,182 @@
                 lastDispatchData = demoResponse;
                 displayResults(demoResponse);
             } finally {
-                submitBtn.disabled = false;
-                submitBtn.textContent = '🚀 Dispatch to AI Agents';
+                isDispatching = false;
+                updateSendButton();
             }
         }
 
-        function getFirstParagraph(text) {
-            const sentences = text.split(/[.!?]+/);
-            if (sentences.length <= 2) return text;
-            return sentences.slice(0, 2).join('.') + '.';
-        }
-
+        // Display results
         function displayResults(data) {
-            const resultsDiv = document.getElementById('results');
-            let html = `
-                <h3>📋 Dispatch Results (ID: ${data.dispatch_id})</h3>
-                <p class="execution-time">⏱️ Total execution time: ${data.execution_time}ms | Mode: ${data.response_mode} (${data.max_tokens} tokens)</p>
-            `;
+            const resultsContainer = document.getElementById('resultsContainer');
+            let html = '';
 
-            // Agent responses with collapsible content
-            Object.entries(data.results).forEach(([agent, result]) => {
-                const isError = result.startsWith('Error:');
-                const validation = data.validations?.[agent];
-                const preview = isError ? result : getFirstParagraph(result);
-                const needsExpansion = !isError && result.length > preview.length;
-                
+            // Display responses
+            Object.entries(data.responses).forEach(([agent, response]) => {
                 html += `
-                    <div class="agent-result ${isError ? 'error' : 'success'}">
-                        <div class="agent-header">
-                            <span class="agent-name">${isError ? '❌' : '✅'} ${agent.toUpperCase()}</span>
-                        </div>
-                        <div class="response-preview">
-                            <p>${preview}${needsExpansion ? `<button class="expand-btn" onclick="expandResponse('${agent}')">Read more</button>` : ''}</p>
-                        </div>
-                        ${needsExpansion ? `
-                            <div id="${agent}-full" class="response-full" style="display:none;">
-                                ${result}
+                    <div class="response-card">
+                        <div class="response-header">
+                            <div class="response-agent">
+                                <span class="agent-badge ${agent}">${agent}</span>
+                                <span>${response.model || agent}</span>
                             </div>
-                        ` : ''}
-                        ${validation ? `
-                            <div class="validation-info">
-                                📊 Quality Score: ${validation.score}/100 | 
-                                ${validation.valid ? '✅ Valid' : '⚠️ Issues: ' + validation.errors.join(', ')}
-                                ${validation.warnings?.length ? ' | ⚠️ ' + validation.warnings.join(', ') : ''}
+                            <div class="response-meta">
+                                <span>📊 ${response.tokens} tokens</span>
+                                <span>⏱️ ${new Date(response.timestamp).toLocaleTimeString()}</span>
                             </div>
-                        ` : ''}
+                        </div>
+                        <div class="response-body">
+                            ${response.response.replace(/\n/g, '<br>')}
+                        </div>
                     </div>
                 `;
             });
 
-            // Judge button if judge is ready
-            if (data.judge_ready && selectedJudge) {
+            // Add judge section if there are multiple responses
+            if (Object.keys(data.responses).length > 1 && selectedJudge !== 'none') {
                 html += `
-                    <button id="runJudgeBtn" class="judge-btn" onclick="runJudge()">
-                        ⚖️ Evaluate with Judge (${selectedJudge.toUpperCase()})
-                    </button>
+                    <div class="judge-section">
+                        <div class="judge-header">
+                            <span>⚖️</span>
+                            <span>Judge Evaluation</span>
+                        </div>
+                        <button class="judge-button" onclick="evaluateWithJudge()">
+                            Evaluate Responses
+                        </button>
+                        <div id="judgeResults"></div>
+                    </div>
                 `;
             }
 
-            resultsDiv.innerHTML = html;
-        }
-
-        function displayJudgeResult(judge) {
-            const resultsDiv = document.getElementById('results');
-            const judgeHtml = `
-                <div class="judge-result">
-                    <h4>🏛️ Judge Verdict ${judge.fallback_used ? '(Fallback Used)' : ''}</h4>
-                    <p><strong>Judge:</strong> ${judge.agent.toUpperCase()}</p>
-                    ${judge.original_judge ? `<p><strong>Original Judge:</strong> ${judge.original_judge.toUpperCase()} (failed)</p>` : ''}
-                    ${judge.fallback_reason ? `<p><strong>Fallback Reason:</strong> ${judge.fallback_reason}</p>` : ''}
-                    <p><strong>Verdict:</strong> ${judge.verdict || judge.error}</p>
-                    ${judge.validation ? `
-                        <div class="validation-info">
-                            📊 Judge Score: ${judge.validation.score}/100 | 
-                            ${judge.validation.valid ? '✅ Valid' : '⚠️ Issues: ' + judge.validation.errors.join(', ')}
+            // Add audit section
+            html += `
+                <div class="audit-section">
+                    <div class="audit-title">📊 Audit Information</div>
+                    <div class="audit-grid">
+                        <div class="audit-item">
+                            <div class="audit-label">Dispatch ID</div>
+                            <div class="audit-value">${data.metadata.dispatch_id}</div>
                         </div>
-                    ` : ''}
-                    <div class="execution-time">⏱️ Judge response time: ${judge.responseTime}ms</div>
+                        <div class="audit-item">
+                            <div class="audit-label">Timestamp</div>
+                            <div class="audit-value">${new Date(data.metadata.timestamp).toLocaleString()}</div>
+                        </div>
+                        <div class="audit-item">
+                            <div class="audit-label">Agents</div>
+                            <div class="audit-value">${data.agents.length}</div>
+                        </div>
+                        <div class="audit-item">
+                            <div class="audit-label">Mode</div>
+                            <div class="audit-value">${data.metadata.mode || 'live'}</div>
+                        </div>
+                    </div>
                 </div>
             `;
-            
-            resultsDiv.innerHTML += judgeHtml;
+
+            resultsContainer.innerHTML = html;
         }
 
-        // Auto-select OpenAI and Google for demo
-        document.addEventListener('DOMContentLoaded', () => {
-            const openaiCard = document.querySelector('[data-agent="openai"]');
-            const googleCard = document.querySelector('[data-agent="google"]');
-            const deepseekCard = document.querySelector('[data-agent="deepseek"]');
+        // Evaluate with judge
+        async function evaluateWithJudge() {
+            if (!lastDispatchData) return;
+
+            const judgeButton = document.querySelector('.judge-button');
+            const judgeResults = document.getElementById('judgeResults');
             
-            openaiCard.click();
-            googleCard.click();
-            deepseekCard.click();
+            judgeButton.disabled = true;
+            judgeButton.textContent = 'Evaluating...';
+
+            try {
+                const backendUrl = getBackendUrl();
+                const response = await fetch(`${backendUrl}/judge`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        prompt: lastDispatchData.prompt,
+                        responses: lastDispatchData.responses,
+                        judge: selectedJudge
+                    })
+                });
+
+                const data = await response.json();
+                
+                if (response.ok) {
+                    displayJudgeResults(data);
+                } else {
+                    throw new Error(data.error || 'Judge evaluation failed');
+                }
+            } catch (error) {
+                console.log('Judge API not available, showing demo evaluation:', error.message);
+                
+                // Demo judge evaluation when API is not available
+                const agents = Object.keys(lastDispatchData.responses);
+                const randomWinner = agents[Math.floor(Math.random() * agents.length)];
+                
+                const demoJudgeResult = {
+                    status: 'success',
+                    judge: selectedJudge || 'anthropic',
+                    winner: randomWinner,
+                    reasoning: `After analyzing all responses, ${randomWinner.toUpperCase()} provided the most comprehensive and accurate answer. The response demonstrated strong understanding of the prompt and delivered practical, well-structured information. (Demo evaluation)`,
+                    scores: {},
+                    timestamp: new Date().toISOString(),
+                    mode: 'demo'
+                };
+                
+                // Generate demo scores
+                agents.forEach(agent => {
+                    demoJudgeResult.scores[agent] = Math.random() * 0.3 + 0.7;
+                });
+                demoJudgeResult.scores[randomWinner] = Math.max(demoJudgeResult.scores[randomWinner], 0.85);
+                
+                displayJudgeResults(demoJudgeResult);
+            } finally {
+                judgeButton.disabled = false;
+                judgeButton.textContent = 'Evaluate Responses';
+            }
+        }
+
+        // Display judge results
+        function displayJudgeResults(data) {
+            const judgeResults = document.getElementById('judgeResults');
             
-            // Set example prompt
-            document.getElementById('prompt').value = 'Explain the concept of artificial intelligence in simple terms.';
-        });
+            let html = `
+                <div style="margin-bottom: 16px; padding: 12px; background: white; border-radius: 6px; border: 1px solid #b3d9ff;">
+                    <strong>🏆 Winner: ${data.winner.toUpperCase()}</strong>
+                </div>
+                
+                <div class="judge-results">
+            `;
+
+            // Display scores
+            Object.entries(data.scores).forEach(([agent, score]) => {
+                const percentage = Math.round(score * 100);
+                html += `
+                    <div class="score-bar">
+                        <div class="score-label">${agent.toUpperCase()}</div>
+                        <div class="score-progress">
+                            <div class="score-fill" style="width: ${percentage}%"></div>
+                        </div>
+                        <div class="score-value">${percentage}%</div>
+                    </div>
+                `;
+            });
+
+            html += `
+                </div>
+                
+                <div style="margin-top: 16px; padding: 12px; background: white; border-radius: 6px; border: 1px solid #b3d9ff; font-style: italic;">
+                    <strong>Reasoning:</strong><br>
+                    ${data.reasoning}
+                </div>
+            `;
+
+            judgeResults.innerHTML = html;
+        }
+
+        // Initialize the app when DOM is loaded
+        document.addEventListener('DOMContentLoaded', initializeApp);
     </script>
 </body>
 </html>
-
