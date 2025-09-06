@@ -1,0 +1,9 @@
+{
+  "name": "polybot-online",
+  "version": "1.0.0",
+  "description": "Polybot Genesis - Multi-Agent AI Dispatch System",
+  "main": "index.html",
+  "scripts": {
+    "build": "echo 'Static site - no build needed'"
+  }
+}
