@@ -2,11 +2,10 @@
   "name": "polybot-genesis",
   "version": "1.0.0", 
   "description": "Multi-agent AI dispatch system with audit logging and judge fallback",
-  "main": "server.js",
+  "main": "index.html",
   "scripts": {
-    "start": "node server.js",
-    "dev": "node server.js",
-    "test": "node test.js"
+    "build": "echo 'No build required for static site'",
+    "start": "echo 'Static site deployment'"
   },
   "dependencies": {
     "express": "^4.18.2",
