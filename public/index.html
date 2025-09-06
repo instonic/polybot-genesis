@@ -355,7 +355,7 @@
         let selectedJudge = null;
         let lastDispatchData = null;
 
-        // Get API base URL with support for custom domain, Codespaces, and localhost
+        // Get API base URL with support for Vercel API, custom domain, Codespaces, and localhost
         function getBackendUrl() {
             // Check for custom domain environment variable (future use)
             const customDomain = window.REACT_APP_API_DOMAIN || '';
@@ -364,9 +364,9 @@
             const codespacesUrl = window.location.origin
                 .replace(/-\d+\.app\.github\.dev/, '-3000.app.github.dev');
             
-            // Check if we're on the custom domain
-            if (window.location.hostname === 'polybot.online') {
-                return 'https://api.polybot.online';
+            // Check if we're on the custom domain or Vercel domain
+            if (window.location.hostname === 'polybot.online' || window.location.hostname.includes('vercel.app')) {
+                return window.location.origin + '/api';
             }
             
             // Priority: custom domain env var > Codespaces > localhost
